@@ -1,2 +1,0 @@
-# MCCulloh-pitts-neuron
-Blog
