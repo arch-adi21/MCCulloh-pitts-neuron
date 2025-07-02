@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🎛️ Interactive McCulloch-Pitts Neuron Playground</title>
+  <title>🧠 McCulloch-Pitts Neuron: The OG Brain Cell of AI! (Interactive)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
@@ -19,10 +19,11 @@
       border-radius: 24px;
       box-shadow: 0 8px 36px rgba(67, 198, 172, 0.13);
       padding: 38px 30px 30px 30px;
+      position: relative;
       border: 3px solid #43c6ac;
     }
     h1 {
-      font-size: 2.4rem;
+      font-size: 2.7rem;
       margin-bottom: 0.7em;
       color: #2d3a61;
       letter-spacing: 1.5px;
@@ -30,6 +31,31 @@
       background: linear-gradient(90deg, #43c6ac 30%, #f8ffae 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      color: #43c6ac;
+      margin-top: 2.2em;
+      margin-bottom: 0.6em;
+      font-size: 1.5rem;
+      border-bottom: 2px dashed #f8ffae;
+      display: inline-block;
+      padding-bottom: 2px;
+    }
+    p {
+      font-size: 1.18rem;
+      line-height: 1.7;
+      margin-bottom: 1.2em;
+    }
+    .math-block {
+      background: #e6fff8;
+      border-left: 6px solid #43c6ac;
+      padding: 12px 22px;
+      margin: 18px 0;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      font-size: 1.13rem;
+      color: #2d3a61;
+      border-radius: 8px;
+      overflow-x: auto;
     }
     .funny {
       background: #ffefc1;
@@ -40,16 +66,60 @@
       border-radius: 8px;
       color: #5f3c00;
     }
-    .controls {
+    .neuron-graph, .gate-example, .or-plane {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 32px 0;
+    }
+    .signature {
+      margin-top: 48px;
+      text-align: right;
+      font-family: 'Dancing Script', cursive, 'Segoe Script', sans-serif;
+      font-size: 1.5rem;
+      color: #43c6ac;
+      letter-spacing: 2px;
+      opacity: 0.93;
+    }
+    .truth-table {
+      border-collapse: collapse;
+      margin: 24px auto;
+      font-size: 1.12rem;
+      background: #e6fff8;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px #43c6ac33;
+    }
+    .truth-table th, .truth-table td {
+      border: 1px solid #43c6ac;
+      padding: 8px 18px;
+      text-align: center;
+    }
+    .truth-table th {
+      background: #43c6ac;
+      color: #fff;
+    }
+    /* Interactive Section */
+    .interactive-section {
       background: #e6fff8;
       border: 2px solid #43c6ac;
-      border-radius: 14px;
-      padding: 18px 18px 8px 18px;
-      margin: 30px 0 22px 0;
+      border-radius: 16px;
+      margin: 48px 0 32px 0;
+      padding: 24px 16px 16px 16px;
+    }
+    .interactive-title {
+      color: #43c6ac;
+      font-size: 1.4rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .controls {
       display: flex;
       flex-wrap: wrap;
       gap: 18px 30px;
       justify-content: center;
+      margin-bottom: 16px;
     }
     .controls label {
       font-weight: bold;
@@ -70,12 +140,6 @@
       margin-left: 7px;
       margin-right: 7px;
     }
-    .neuron-graph {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 32px 0 20px 0;
-    }
     .result {
       text-align: center;
       font-size: 1.35rem;
@@ -85,38 +149,11 @@
       font-weight: bold;
       letter-spacing: 1px;
     }
-    .truth-table {
-      border-collapse: collapse;
-      margin: 24px auto;
-      font-size: 1.12rem;
-      background: #e6fff8;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px #43c6ac33;
-    }
-    .truth-table th, .truth-table td {
-      border: 1px solid #43c6ac;
-      padding: 8px 18px;
-      text-align: center;
-    }
-    .truth-table th {
-      background: #43c6ac;
-      color: #fff;
-    }
     .plane-graph {
       display: flex;
       justify-content: center;
       align-items: center;
       margin: 32px 0 16px 0;
-    }
-    .signature {
-      margin-top: 48px;
-      text-align: right;
-      font-family: 'Dancing Script', cursive, 'Segoe Script', sans-serif;
-      font-size: 1.5rem;
-      color: #43c6ac;
-      letter-spacing: 2px;
-      opacity: 0.93;
     }
     @media (max-width: 600px) {
       .container {
@@ -124,7 +161,7 @@
         margin: 10px 2vw;
       }
       h1 {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
       }
       .controls {
         flex-direction: column;
@@ -138,62 +175,227 @@
 </head>
 <body>
   <div class="container">
-    <h1>🎛️ Interactive McCulloch-Pitts Neuron Playground</h1>
+    <h1>🧠 McCulloch-Pitts Neuron: The OG Brain Cell of AI! (Interactive)</h1>
+
     <div class="funny">
-      <strong>Meet the McCulloch-Pitts neuron:</strong> The original "bouncer" of AI!<br>
-      <em>Give me your inputs, weights, and threshold, and I'll tell you if the party is ON (fires) or OFF (snoozes)!</em>
+      <strong>Imagine if your brain ran on simple "yes/no" questions, and every neuron was a little bouncer at a club:</strong>
+      <br>
+      "Are you on the list? If enough of you are, you get in. If not, sorry, try again!"<br>
+      That’s basically the McCulloch-Pitts neuron—simple, decisive, and a little bit dramatic.
     </div>
 
-    <form class="controls" id="mp-controls" oninput="updateNeuron()">
-      <div>
-        <label>x₁:</label>
-        <input type="number" id="x1" min="0" max="1" value="0">
-        <label>w₁:</label>
-        <input type="number" id="w1" min="-1" max="1" value="1">
-      </div>
-      <div>
-        <label>x₂:</label>
-        <input type="number" id="x2" min="0" max="1" value="0">
-        <label>w₂:</label>
-        <input type="number" id="w2" min="-1" max="1" value="1">
-      </div>
-      <div>
-        <label>x₃ (inhibitory):</label>
-        <input type="number" id="x3" min="0" max="1" value="0">
-        <label>w₃:</label>
-        <input type="number" id="w3" min="-1" max="1" value="-1">
-      </div>
-      <div>
-        <label>Threshold (θ):</label>
-        <input type="number" id="theta" min="0" max="3" value="1">
-      </div>
-    </form>
+    <h2>What is the McCulloch-Pitts Neuron?</h2>
+    <p>
+      The <strong>McCulloch-Pitts neuron</strong> is the <em>first-ever mathematical model of a brain cell</em>, invented in 1943 by Warren McCulloch and Walter Pitts. It’s the grandparent of all artificial neural networks and the reason your AI can (sort of) tell a cat from a dog.
+    </p>
+    <p>
+      It’s a <strong>binary threshold device</strong>: it takes several inputs (think: "Is it raining?" "Is it sunny?"), adds them up, and if the total is big enough, it “fires” (outputs a 1). If not, it stays silent (outputs a 0).<br>
+      <em>It’s like a light switch: all or nothing!</em>
+    </p>
 
-    <div class="result" id="mp-result">
-      Output (y): <span id="mp-output">0</span>
+    <h2>Mathematical Definition</h2>
+    <div class="math-block">
+      For inputs \( x_1, x_2, ..., x_n \) (each 0 or 1) and weights \( w_1, w_2, ..., w_n \) (either +1 or -1), the neuron computes:<br><br>
+      \[
+        S = \sum_{i=1}^{n} w_i x_i
+      \]
+      <br>
+      The output is:
+      <br>
+      \[
+        y = 
+        \begin{cases}
+          1 & \text{if } S \geq \theta \\
+          0 & \text{otherwise}
+        \end{cases}
+      \]
+      where \( \theta \) is the threshold.
     </div>
+    <p>
+      <strong>Excitatory inputs</strong> (weights +1) cheer the neuron to fire, while <strong>inhibitory inputs</strong> (weights -1) are party poopers—if any inhibitory input is 1, the neuron refuses to fire, no matter what.
+    </p>
 
-    <div class="neuron-graph" id="neuron-svg-container">
-      <!-- SVG will be rendered here -->
+    <h2>Theoretical Definition (in Plain English!)</h2>
+    <ul>
+      <li>The neuron <strong>adds up all its inputs</strong> (after multiplying by their weights).</li>
+      <li>If the total is at least the threshold, it <strong>outputs 1</strong> (it “fires”).</li>
+      <li>If not, it <strong>outputs 0</strong> (it “snoozes”).</li>
+      <li>If any inhibitory input is 1, it always outputs 0, no matter what.</li>
+      <li>This is called <strong>threshold logic</strong>—the neuron is a little decision-maker.</li>
+    </ul>
+
+    <div class="neuron-graph">
+      <!-- Interactive SVG: McCulloch-Pitts Neuron -->
+      <svg width="380" height="190" viewBox="0 0 380 190">
+        <ellipse cx="260" cy="95" rx="60" ry="85" fill="#f8ffae" stroke="#43c6ac" stroke-width="5"/>
+        <text x="260" y="55" text-anchor="middle" font-size="1.4em" fill="#43c6ac" font-weight="bold">Neuron</text>
+        <!-- Excitatory inputs -->
+        <line x1="40" y1="50" x2="200" y2="70" stroke="#43c6ac" stroke-width="4" marker-end="url(#arrow)"/>
+        <circle cx="40" cy="50" r="14" fill="#e6fff8" stroke="#43c6ac" stroke-width="3"/>
+        <text x="40" y="55" text-anchor="middle" font-size="1.1em" fill="#43c6ac">x₁</text>
+        <line x1="40" y1="140" x2="200" y2="120" stroke="#43c6ac" stroke-width="4" marker-end="url(#arrow)"/>
+        <circle cx="40" cy="140" r="14" fill="#e6fff8" stroke="#43c6ac" stroke-width="3"/>
+        <text x="40" y="145" text-anchor="middle" font-size="1.1em" fill="#43c6ac">x₂</text>
+        <!-- Inhibitory input -->
+        <line x1="40" y1="95" x2="200" y2="95" stroke="#ffb347" stroke-width="4" marker-end="url(#circle)"/>
+        <circle cx="40" cy="95" r="14" fill="#fffbe7" stroke="#ffb347" stroke-width="3"/>
+        <text x="40" y="100" text-anchor="middle" font-size="1.1em" fill="#ffb347">x₃</text>
+        <!-- Output -->
+        <line x1="320" y1="95" x2="360" y2="95" stroke="#43c6ac" stroke-width="5" marker-end="url(#arrow)"/>
+        <circle cx="360" cy="95" r="14" fill="#e6fff8" stroke="#43c6ac" stroke-width="3"/>
+        <text x="360" y="100" text-anchor="middle" font-size="1.1em" fill="#43c6ac">y</text>
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#43c6ac"/>
+          </marker>
+          <marker id="circle" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+            <circle cx="6" cy="3" r="3" fill="#ffb347"/>
+          </marker>
+        </defs>
+      </svg>
     </div>
+    <p style="text-align:center; color:#ffb347; font-size:1.05em;">
+      <em>Excitatory inputs (green) say “Go!” &mdash; Inhibitory input (orange) says “Nope!”</em>
+    </p>
 
-    <div class="plane-graph" id="plane-svg-container">
-      <!-- Decision boundary SVG will be rendered here -->
-    </div>
-
-    <table class="truth-table" id="mp-table">
+    <h2>Let's Build an OR Gate (Interactive Example!)</h2>
+    <p>
+      The McCulloch-Pitts neuron is a <strong>champion at logic gates</strong>. Let’s see how it rocks the <span style="color:#43c6ac;font-weight:bold;">OR gate</span>:
+    </p>
+    <table class="truth-table">
       <tr>
         <th>x₁</th>
         <th>x₂</th>
-        <th>x₃</th>
         <th>Sum</th>
         <th>Output (y)</th>
       </tr>
-      <!-- Table rows will be filled by JS -->
+      <tr>
+        <td>0</td><td>0</td><td>0</td><td>0</td>
+      </tr>
+      <tr>
+        <td>0</td><td>1</td><td>1</td><td>1</td>
+      </tr>
+      <tr>
+        <td>1</td><td>0</td><td>1</td><td>1</td>
+      </tr>
+      <tr>
+        <td>1</td><td>1</td><td>2</td><td>1</td>
+      </tr>
     </table>
+    <div class="gate-example">
+      <!-- Interactive SVG: OR Gate as MP Neuron -->
+      <svg width="320" height="120" viewBox="0 0 320 120">
+        <rect x="120" y="35" width="80" height="50" rx="20" fill="#f8ffae" stroke="#43c6ac" stroke-width="3"/>
+        <text x="160" y="63" text-anchor="middle" font-size="1.2em" fill="#43c6ac" font-weight="bold">MP Neuron</text>
+        <line x1="40" y1="50" x2="120" y2="55" stroke="#43c6ac" stroke-width="4" marker-end="url(#arrow2)"/>
+        <circle cx="40" cy="50" r="12" fill="#e6fff8" stroke="#43c6ac" stroke-width="2"/>
+        <text x="40" y="55" text-anchor="middle" font-size="1em" fill="#43c6ac">x₁</text>
+        <line x1="40" y1="90" x2="120" y2="75" stroke="#43c6ac" stroke-width="4" marker-end="url(#arrow2)"/>
+        <circle cx="40" cy="90" r="12" fill="#e6fff8" stroke="#43c6ac" stroke-width="2"/>
+        <text x="40" y="95" text-anchor="middle" font-size="1em" fill="#43c6ac">x₂</text>
+        <line x1="200" y1="60" x2="280" y2="60" stroke="#43c6ac" stroke-width="5" marker-end="url(#arrow2)"/>
+        <circle cx="280" cy="60" r="12" fill="#e6fff8" stroke="#43c6ac" stroke-width="2"/>
+        <text x="280" y="65" text-anchor="middle" font-size="1em" fill="#43c6ac">y</text>
+        <defs>
+          <marker id="arrow2" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#43c6ac"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <p style="text-align:center; color:#43c6ac; font-size:1.08em;">
+      <em>Set weights \( w_1 = w_2 = 1 \), threshold \( \theta = 1 \). If either input is 1, the neuron fires!</em>
+    </p>
+
+    <h2>Geometric Area: The Positive Half-Plane</h2>
+    <p>
+      Here’s where it gets cool—and a little artsy! The McCulloch-Pitts neuron <strong>divides the input space</strong> into two regions:
+    </p>
+    <ul>
+      <li><strong>Positive half (fires):</strong> All input combinations where the sum is at least the threshold (on or above the line/plane).</li>
+      <li><strong>Negative half (snoozes):</strong> All input combos below the threshold.</li>
+    </ul>
+    <div class="or-plane">
+      <!-- Interactive SVG: OR Gate Decision Boundary -->
+      <svg width="350" height="220" viewBox="0 0 350 220">
+        <rect x="0" y="0" width="350" height="220" fill="#e6fff8" rx="18"/>
+        <line x1="60" y1="180" x2="260" y2="20" stroke="#43c6ac" stroke-width="4"/>
+        <text x="265" y="25" font-size="1.1em" fill="#43c6ac">x₁ + x₂ = 1</text>
+        <circle cx="60" cy="180" r="12" fill="#ffb347" stroke="#43c6ac" stroke-width="2"/>
+        <text x="60" y="195" font-size="1em" fill="#ffb347">(0,0)</text>
+        <circle cx="60" cy="100" r="12" fill="#43c6ac" stroke="#43c6ac" stroke-width="2"/>
+        <text x="60" y="115" font-size="1em" fill="#43c6ac">(0,1)</text>
+        <circle cx="160" cy="180" r="12" fill="#43c6ac" stroke="#43c6ac" stroke-width="2"/>
+        <text x="160" y="195" font-size="1em" fill="#43c6ac">(1,0)</text>
+        <circle cx="160" cy="100" r="12" fill="#43c6ac" stroke="#43c6ac" stroke-width="2"/>
+        <text x="160" y="115" font-size="1em" fill="#43c6ac">(1,1)</text>
+        <text x="210" y="60" font-size="1em" fill="#43c6ac">Positive half (fires!)</text>
+        <text x="100" y="200" font-size="1em" fill="#ffb347">Negative half (dozes)</text>
+      </svg>
+    </div>
+    <p style="text-align:center; color:#43c6ac; font-size:1.08em;">
+      <em>All points on or above the line <strong>x₁ + x₂ = 1</strong> are in the “party zone”—the neuron fires!</em>
+    </p>
 
     <div class="funny">
-      <strong>Try different combos!</strong> Set x₃=1 (with w₃=-1) to see how an inhibitory input always blocks the party, no matter how many friends you bring!
+      <strong>In summary:</strong> The McCulloch-Pitts neuron is like a bouncer who lets you into the club if you bring enough friends (inputs) or if you’re really persuasive (excitatory). But if you bring a party pooper (inhibitory), the whole group is out!
+    </div>
+
+    <h2>Why Is This So Cool?</h2>
+    <ul>
+      <li>It’s the <strong>foundation of all neural networks</strong>—the ancestor of deep learning!</li>
+      <li>It taught computers to do logic, make decisions, and even <em>divide space</em> like a mathematical ninja.</li>
+      <li>It’s simple, but powerful enough to simulate any finite automaton—like a mini-brain.</li>
+    </ul>
+
+    <!-- INTERACTIVE SECTION -->
+    <div class="interactive-section">
+      <div class="interactive-title">🎛️ Try It Yourself: Interactive McCulloch-Pitts Neuron Playground</div>
+      <div style="text-align:center; color:#5f3c00; margin-bottom:10px;">
+        <em>Adjust the inputs, weights, and threshold below. See the neuron fire (or not) and how the decision boundary changes!</em>
+      </div>
+      <form class="controls" id="mp-controls" oninput="updateNeuron()">
+        <div>
+          <label>x₁:</label>
+          <input type="number" id="x1" min="0" max="1" value="0">
+          <label>w₁:</label>
+          <input type="number" id="w1" min="-1" max="1" value="1">
+        </div>
+        <div>
+          <label>x₂:</label>
+          <input type="number" id="x2" min="0" max="1" value="0">
+          <label>w₂:</label>
+          <input type="number" id="w2" min="-1" max="1" value="1">
+        </div>
+        <div>
+          <label>x₃ (inhibitory):</label>
+          <input type="number" id="x3" min="0" max="1" value="0">
+          <label>w₃:</label>
+          <input type="number" id="w3" min="-1" max="1" value="-1">
+        </div>
+        <div>
+          <label>Threshold (θ):</label>
+          <input type="number" id="theta" min="0" max="3" value="1">
+        </div>
+      </form>
+      <div class="result" id="mp-result">
+        Output (y): <span id="mp-output">0</span>
+      </div>
+      <div class="neuron-graph" id="neuron-svg-container"></div>
+      <div class="plane-graph" id="plane-svg-container"></div>
+      <table class="truth-table" id="mp-table">
+        <tr>
+          <th>x₁</th>
+          <th>x₂</th>
+          <th>x₃</th>
+          <th>Sum</th>
+          <th>Output (y)</th>
+        </tr>
+        <!-- Table rows will be filled by JS -->
+      </table>
+      <div class="funny" style="margin-top:22px;">
+        <strong>Try different combos!</strong> Set x₃=1 (with w₃=-1) to see how an inhibitory input always blocks the party, no matter how many friends you bring!
+      </div>
     </div>
 
     <div class="signature">
